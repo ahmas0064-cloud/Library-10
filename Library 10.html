@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LIBRARY 10</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f111a;
+            color: #e0e6ed;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* View Container Transition */
+        .view-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.98);
+            z-index: 0;
+        }
+
+        .active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 1;
+        }
+
+        /* --- LIBRARY VIEW STYLES --- */
+        #library-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: linear-gradient(135deg, #0d0e15 0%, #1a1d2e 100%);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 30px;
+            background-color: rgba(15, 17, 26, 0.85);
+            border-bottom: 1px solid #2a2e45;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.03);
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            margin-right: 12px;
+            background: linear-gradient(45deg, #ff0055, #7a00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background-color: #161926;
+            border: 1px solid #2a2e45;
+            color: #94a3b8;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #ffffff;
+            border-color: #00d2ff;
+        }
+
+        .tab-btn.active-tab {
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .search-container {
+            position: relative;
+            width: 240px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 16px;
+            border-radius: 20px;
+            border: 1px solid #2a2e45;
+            background-color: #161926;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #16192b;
+            border: 1px solid #23273e;
+            border-radius: 12px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #7a00ff;
+            box-shadow: 0 8px 20px rgba(122, 0, 255, 0.25);
+        }
+
+        .card-icon {
+            font-size: 44px;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f4f8;
+            text-align: center;
+        }
+
+        .card-url {
+            font-size: 11px;
+            color: #6c7293;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        /* --- MORE TAB STYLES --- */
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background-color: #16192b;
+            border: 1px solid #23273e;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-card h2 {
+            font-size: 18px;
+            color: #00d2ff;
+            border-bottom: 1px solid #23273e;
+            padding-bottom: 10px;
+        }
+
+        .info-card p, .info-card ul {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-card ul li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .info-card ul li::before {
+            content: "•";
+            color: #7a00ff;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .form-group input, .form-group textarea {
+            background-color: #0d0e15;
+            border: 1px solid #2a2e45;
+            border-radius: 8px;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #00d2ff;
+        }
+
+        .btn-submit {
+            background: linear-gradient(45deg, #ff0055, #7a00ff);
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        footer {
+            padding: 12px 30px;
+            background-color: #0b0c12;
+            border-top: 1px solid #1a1d2e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #525875;
+        }
+
+        /* --- CALCULATOR STYLES --- */
+        #calc-view {
+            background-color: #202020;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calc-window {
+            width: 320px;
+            background-color: #202020;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+
+        .calc-header {
+            font-size: 13px;
+            color: #cccccc;
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+
+        .calc-display {
+            background-color: #202020;
+            color: #ffffff;
+            text-align: right;
+            padding: 16px 8px;
+            font-size: 38px;
+            font-weight: 300;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 80px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+
+        .btn-calc {
+            background-color: #2b2b2b;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            height: 48px;
+            font-size: 15px;
+            font-weight: 400;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.1s;
+        }
+
+        .btn-calc:hover {
+            background-color: #3b3b3b;
+        }
+
+        .btn-calc:active {
+            background-color: #1f1f1f;
+        }
+
+        .btn-calc.btn-operator {
+            background-color: #323232;
+        }
+
+        .btn-calc.btn-equals {
+            background-color: #4cc2ff;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .btn-calc.btn-equals:hover {
+            background-color: #70ceff;
+        }
+
+        .btn-calc.btn-equals:active {
+            background-color: #3aa3d9;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LIBRARY VIEW -->
+    <div id="library-view" class="view-container active">
+        <header>
+            <div class="logo-container" id="secret-logo" title="LIBRARY 10 (Click for Calculator)">
+                <span class="logo-icon">🎮</span>
+                <span class="logo-text">LIBRARY 10</span>
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active-tab" id="tab-games" onclick="switchCategory('games')">🎮 Games</button>
+                <button class="tab-btn" id="tab-social" onclick="switchCategory('social')">💬 Socials</button>
+                <button class="tab-btn" id="tab-more" onclick="switchCategory('more')">⚙️ More</button>
+            </div>
+            <div class="search-container" id="search-wrapper">
+                <input type="text" id="search-bar" class="search-input" placeholder="Search..." />
+            </div>
+        </header>
+        <main class="main-content">
+            <div class="grid-container" id="cards-grid"></div>
+            <div class="info-panel hidden" id="more-panel">
+                <!-- How to Use -->
+                <div class="info-card">
+                    <h2>📖 How to Use</h2>
+                    <ul>
+                        <li><strong>Browse Links:</strong> Click any card in <i>Games</i> or <i>Socials</i> to open the website in a new tab.</li>
+                        <li><strong>Search Bar:</strong> Use the search input at the top right to filter apps quickly.</li>
+                        <li><strong>Secret Mode:</strong> Click the <b>LIBRARY 10</b> logo at the top left to instantly switch to standard calculator mode.</li>
+                        <li><strong>Quick Toggle:</strong> Press <b>Ctrl + Q</b> anytime on your keyboard to switch between the library and calculator.</li>
+                    </ul>
+                </div>
+
+                <!-- Suggestions Form -->
+                <div class="info-card">
+                    <h2>💡 Send Suggestions</h2>
+                    <p>Have ideas for new gaming or social links? Send your feedback!</p>
+                    <form onsubmit="handleSuggestion(event)">
+                        <div class="form-group">
+                            <label for="sug-name">Your Name</label>
+                            <input type="text" id="sug-name" placeholder="Enter your name" required />
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label for="sug-msg">Suggestion / Website Link</label>
+                            <textarea id="sug-msg" rows="3" placeholder="Tell us what site to add..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit" style="margin-top: 14px;">Submit Suggestion</button>
+                    </form>
+                </div>
+
+                <!-- About -->
+                <div class="info-card">
+                    <h2>ℹ️ About</h2>
+                    <p><strong>LIBRARY 10</strong> is a sleek, minimal hub providing fast access to top web games and popular social media applications.</p>
+                    <p style="margin-top: 10px;"> Designed with a dual-interface feature for quick utility switching.</p>
+                    <p style="margin-top: 15px; font-weight: 600; color: #00d2ff;">Made by Arish</p>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <span id="footer-text">LIBRARY 10 Gaming Portal</span>
+            <span>Made by Arish | Shortcut: Ctrl + Q</span>
+        </footer>
+    </div>
+
+    <!-- CALCULATOR VIEW -->
+    <div id="calc-view" class="view-container hidden">
+        <div class="calc-window">
+            <div class="calc-header">Standard Calculator</div>
+            <div class="calc-display" id="calc-display">0</div>
+            <div class="calc-grid">
+                <button class="btn-calc btn-operator" onclick="calcClear()">AC</button>
+                <button class="btn-calc btn-operator" onclick="calcDelete()">DEL</button>
+                <button class="btn-calc btn-operator" onclick="appendOp('÷', '/')">÷</button>
+                <button class="btn-calc btn-operator" onclick="appendOp('×', '*')">×</button>
+
+                <button class="btn-calc" onclick="appendNum('7')">7</button>
+                <button class="btn-calc" onclick="appendNum('8')">8</button>
+                <button class="btn-calc" onclick="appendNum('9')">9</button>
+                <button class="btn-calc btn-operator" onclick="appendOp('-', '-')">-</button>
+
+                <button class="btn-calc" onclick="appendNum('4')">4</button>
+                <button class="btn-calc" onclick="appendNum('5')">5</button>
+                <button class="btn-calc" onclick="appendNum('6')">6</button>
+                <button class="btn-calc btn-operator" onclick="appendOp('+', '+')">+</button>
+
+                <button class="btn-calc" onclick="appendNum('1')">1</button>
+                <button class="btn-calc" onclick="appendNum('2')">2</button>
+                <button class="btn-calc" onclick="appendNum('3')">3</button>
+                <button class="btn-calc btn-equals" style="grid-row: span 2; height: 100px;" onclick="calculateResult()">=</button>
+
+                <button class="btn-calc" style="grid-column: span 2;" onclick="appendNum('0')">0</button>
+                <button class="btn-calc" onclick="appendNum('.')">.</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 10 Gaming Websites
+        const games = [
+            { name: "Poki", icon: "🎮", url: "https://poki.com/" },
+            { name: "CrazyGames", icon: "⚡", url: "https://www.crazygames.com/" },
+            { name: "Y8", icon: "🕹️", url: "https://www.y8.com/" },
+            { name: "itch.io", icon: "🎨", url: "https://itch.io/games/free" },
+            { name: "GamePix", icon: "🧩", url: "https://www.gamepix.com/" },
+            { name: "Armor Games", icon: "🛡️", url: "https://armorgames.com/" },
+            { name: "Kongregate", icon: "🏆", url: "https://www.kongregate.com/" },
+            { name: "Coolmath Games", icon: "🧠", url: "https://www.coolmathgames.com/" },
+            { name: "Newgrounds", icon: "🟠", url: "https://www.newgrounds.com/games" },
+            { name: "Miniclip", icon: "🏀", url: "https://www.miniclip.com/" }
+        ];
+
+        // 10 Social Media & Streaming Apps
+        const socials = [
+            { name: "YouTube", icon: "📺", url: "https://www.youtube.com/" },
+            { name: "TikTok", icon: "🎵", url: "https://www.tiktok.com/" },
+            { name: "Instagram", icon: "📸", url: "https://www.instagram.com/" },
+            { name: "X (Twitter)", icon: "🐦", url: "https://x.com/" },
+            { name: "Discord", icon: "💬", url: "https://discord.com/" },
+            { name: "Twitch", icon: "🎮", url: "https://www.twitch.tv/" },
+            { name: "Facebook", icon: "👥", url: "https://www.facebook.com/" },
+            { name: "Pinterest", icon: "📌", url: "https://www.pinterest.com/" },
+            { name: "Reddit", icon: "🎥", url: "https://www.reddit.com/" },
+            { name: "WhatsApp Web", icon: "💬", url: "https://web.whatsapp.com/" }
+        ];
+
+        let currentCategory = "games"; // 'games', 'social', or 'more'
+
+        function switchCategory(category) {
+            currentCategory = category;
+            document.getElementById("tab-games").className = category === "games" ? "tab-btn active-tab" : "tab-btn";
+            document.getElementById("tab-social").className = category === "social" ? "tab-btn active-tab" : "tab-btn";
+            document.getElementById("tab-more").className = category === "more" ? "tab-btn active-tab" : "tab-btn";
+            
+            const searchWrapper = document.getElementById("search-wrapper");
+            const grid = document.getElementById("cards-grid");
+            const panel = document.getElementById("more-panel");
+
+            if (category === "more") {
+                searchWrapper.style.display = "none";
+                grid.style.display = "none";
+                panel.className = "info-panel active";
+                document.getElementById("footer-text").innerText = "LIBRARY 10 Info & Settings";
+            } else {
+                searchWrapper.style.display = "block";
+                grid.style.display = "grid";
+                panel.className = "info-panel hidden";
+                document.getElementById("footer-text").innerText = category === "games" ? "LIBRARY 10 Gaming Portal" : "LIBRARY 10 Social Media Portal";
+                document.getElementById("search-bar").value = "";
+                renderContent();
+            }
+        }
+
+        // Render Cards
+        function renderContent(filter = "") {
+            const grid = document.getElementById("cards-grid");
+            grid.innerHTML = "";
+            const searchTerm = filter.toLowerCase();
+            const dataset = currentCategory === "games" ? games : socials;
+
+            dataset.forEach(item => {
+                if (item.name.toLowerCase().includes(searchTerm)) {
+                    const card = document.createElement("a");
+                    card.className = "card";
+                    card.href = item.url;
+                    card.target = "_blank";
+                    card.rel = "noopener noreferrer";
+
+                    card.innerHTML = `
+                        <div class="card-icon">${item.icon}</div>
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-url">${item.url.replace('https://', '').replace('www.', '')}</div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function handleSuggestion(e) {
+            e.preventDefault();
+            alert("Thank you for your suggestion!");
+            document.getElementById("sug-name").value = "";
+            document.getElementById("sug-msg").value = "";
+        }
+
+        // Mode Switching (Library vs Calculator)
+        let currentMode = "library";
+
+        function toggleMode() {
+            const libView = document.getElementById("library-view");
+            const calcView = document.getElementById("calc-view");
+
+            if (currentMode === "library") {
+                libView.className = "view-container hidden";
+                calcView.className = "view-container active";
+                currentMode = "calc";
+            } else {
+                calcView.className = "view-container hidden";
+                libView.className = "view-container active";
+                currentMode = "library";
+            }
+        }
+
+        // Global Keyboard Shortcut (Ctrl + Q)
+        document.addEventListener("keydown", (e) => {
+            const target = e.target;
+            const isInput = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA");
+
+            if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+                if (!isInput) {
+                    e.preventDefault();
+                    toggleMode();
+                }
+            }
+        });
+
+        // Calculator Logic
+        let calcDisplayValue = ""; // Visual string with +, -, ×, ÷
+        let calcEvalString = "";   // Backend evaluation string with +, -, *, /
+
+        function updateDisplay(val) {
+            const display = document.getElementById("calc-display");
+            display.innerText = val || "0";
+        }
+
+        function appendNum(num) {
+            calcDisplayValue += num;
+            calcEvalString += num;
+            updateDisplay(calcDisplayValue);
+        }
+
+        function appendOp(symbol, operator) {
+            if (calcDisplayValue === "" && symbol !== "-") return;
+            const lastCharEval = calcEvalString.slice(-1);
+            if ("+-*/".includes(lastCharEval)) {
+                calcDisplayValue = calcDisplayValue.slice(0, -1);
+                calcEvalString = calcEvalString.slice(0, -1);
+            }
+            calcDisplayValue += symbol;
+            calcEvalString += operator;
+            updateDisplay(calcDisplayValue);
+        }
+
+        function calcClear() {
+            calcDisplayValue = "";
+            calcEvalString = "";
+            updateDisplay("0");
+        }
+
+        function calcDelete() {
+            if (calcDisplayValue.length > 0) {
+                calcDisplayValue = calcDisplayValue.slice(0, -1);
+                calcEvalString = calcEvalString.slice(0, -1);
+                updateDisplay(calcDisplayValue);
+            }
+        }
+
+        function calculateResult() {
+            if (!calcEvalString) return;
+            try {
+                const result = Function('"use strict"; return (' + calcEvalString + ')')();
+                calcEvalString = String(result);
+                calcDisplayValue = String(result);
+                updateDisplay(calcDisplayValue);
+            } catch (e) {
+                updateDisplay("Error");
+                calcDisplayValue = "";
+                calcEvalString = "";
+            }
+        }
+
+        // Initialization
+        window.addEventListener("DOMContentLoaded", () => {
+            renderContent();
+
+            document.getElementById("secret-logo").addEventListener("click", toggleMode);
+
+            document.getElementById("search-bar").addEventListener("keyup", (e) => {
+                renderContent(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
+
